@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        body{
+            width: 100vw;
+            height: 100vh;
+        }
+        #wrapper{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+        }
+        #ball-wrapper{
+            position: absolute;
+            width: calc(100% - 40px);
+            height: calc(100% - 40px);
+            top: 20px;
+            left: 20px;
+        }
+        #ball{
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ffffff;
+        }
+        #board-top{
+            top: 0;
+         }
+        #board-right{
+            right: 0;
+        }
+        #board-left{
+            left: 0;
+        }
+        #board-bottom {
+            bottom: 0;
+        }
+        .board{
+            position: absolute;
+            background-color: darkred;
+            border-radius: 3px;
+        }
+        .board-v{
+            width: 20px;
+            height: 150px;
+        }
+        .board-h{
+            width: 150px;
+            height: 20px;
+        }
+        .hide{
+            display: none;
+        }
+        #popup{
+            position: absolute;
+            width: 500px;
+            line-height: 250px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            text-align: center;
+            top: calc(50% - 125px);
+            left: calc(50% - 250px);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="popup">
+            <h1>Булька з носа</h1>
+        </div>
+        <div id="ball-wrapper">
+            <div id="ball" class="game-elem"></div>
+        </div>
+
+        <div id="board-top" class="board board-h game-elem"></div>
+        <div id="board-right" class="board board-v game-elem"></div>
+        <div id="board-left" class="board board-v game-elem"></div>
+        <div id="board-bottom" class="board board-h game-elem"></div>
+    </div>
+    <script>
+        window.onload = function(){
+            var ballWrapper = document.getElementById('ball-wrapper'),
+                ball = document.getElementById('ball'),
+                boardTop = document.getElementById('board-top'),
+                boardLeft = document.getElementById('board-left'),
+                boardRight = document.getElementById('board-right'),
+                boardBottom = document.getElementById('board-bottom'),
+                ballWrapperWidth = ballWrapper.offsetWidth,
+                ballWrapperHeight = ballWrapper.offsetHeight,
+                tb = true, lr = true;
+
+            function runBall(){
+                var spaceTop = ball.offsetTop,
+                    spaceLeft = ball.offsetLeft;
+                if(spaceTop => 0 && spaceTop <= (ballWrapperHeight - 50)){
+                    if(tb){
+                        if(spaceTop == (ballWrapperHeight - 50)){
+                            var ballRect = ball.getBoundingClientRect(),
+                                boardBottomRect = boardBottom.getBoundingClientRect();
+                            if((ballRect.left + 25) >= boardBottomRect.left && (ballRect.left + 25) <= boardBottomRect.right){
+                                tb = false;
+                            }else{
+                                var restart = confirm('Game over! Ще раз?');
+                                stopBall(restart);
+                            }
+                        }
+                        ball.style.top = spaceTop+2+'px';
+                    }else{
+                        if(spaceTop == 0){
+                            var ballRect = ball.getBoundingClientRect(),
+                                boardTopRect = boardTop.getBoundingClientRect();
+                            if((ballRect.left + 25) >= boardTopRect.left && (ballRect.left + 25) <= boardTopRect.right){
+                                tb = true;
+                            }else{
+                                var restart = confirm('Game over! Ще раз?');
+                                stopBall(restart);
+                            }
+                        }
+                        ball.style.top = spaceTop-2+'px';
+                    }
+                }
+
+                if(spaceLeft >= 0 && spaceLeft <= ballWrapperWidth){
+                    if(lr){
+                        if(spaceLeft == (ballWrapperWidth - 50)) {
+                            var ballRect = ball.getBoundingClientRect(),
+                                boardRightRect = boardRight.getBoundingClientRect();
+                            if((ballRect.top + 25) >= boardRightRect.top && (ballRect.top + 25) <= boardRightRect.bottom){
+                                lr = false;
+                            }else{
+                                var restart = confirm('Game over! Ще раз?');
+                                stopBall(restart);
+                            }
+                        };
+                        ball.style.left = spaceLeft+1+'px';
+                    }else{
+                        if(spaceLeft == 1){
+                            var ballRect = ball.getBoundingClientRect(),
+                                boardLeftRect = boardLeft.getBoundingClientRect();
+                            if((ballRect.top + 25) >= boardLeftRect.top && (ballRect.top + 25) <= boardLeftRect.bottom){
+                                lr = true;
+                            }else{
+                                var restart = confirm('Game over! Ще раз?');
+                                stopBall(restart);
+                            }
+                        };
+                        ball.style.left = spaceLeft-1+'px';
+                    }
+                }
+            }
+
+            document.onmousemove = function(event){
+                var mouseX = event.pageX || event.clientX,
+                    mouseY = event.pageY || event.clientY;
+
+                if(mouseX >= 95 && mouseX <= (ballWrapperWidth - 55)){
+                    boardTop.style.left = mouseX-75+'px';
+                    boardBottom.style.left = mouseX-75+'px';
+                }
+
+                if(mouseY >= 95 && mouseY <= (ballWrapperHeight - 55)){
+                    boardLeft.style.top = mouseY-75+'px';
+                    boardRight.style.top = mouseY-75+'px';
+                }
+            }
+
+            function gameElemHide(){
+                var gameElem = document.getElementsByClassName('game-elem'),
+                    popup = document.getElementById('popup');
+                for(var i = 0; i < gameElem.length; i++){
+                    gameElem[i].classList.add('hide');
+                }
+                popup.style.display = 'block';
+            }
+
+            function stopBall(param){
+                clearInterval(runBallInterval);
+                if(param){
+                    window.location.href = 'run_ball.html';
+                }else{
+                    gameElemHide();
+                    document.onmousemove = function(){};
+                }
+            }
+
+            var runBallInterval = setInterval(runBall, 5);
+        }
+    </script>
+</body>
+</html>
